@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Special Day Naefindra</title>
+  <!-- Google Fonts & Canvas Confetti -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #f0f9ff 100%);
+      color: #0369a1;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+    .container {
+      width: 90%;
+      max-width: 650px;
+      min-height: 520px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 2px solid #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(2, 132, 199, 0.15);
+      padding: 30px;
+      text-align: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .slide {
+      display: none;
+      width: 100%;
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1, h2 {
+      color: #0284c7;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #0369a1;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+    .btn {
+      margin-top: 25px;
+      padding: 12px 32px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: #38bdf8;
+      color: #ffffff;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background: #0284c7;
+      transform: translateY(-2px);
+    }
+    
+    /* Countdown */
+    .timer-box {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #0284c7;
+      background: #ffffff;
+      padding: 15px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      letter-spacing: 2px;
+      margin-top: 20px;
+    }
+
+    /* Keypad PIN */
+    .pin-display {
+      width: 180px;
+      height: 50px;
+      background: #ffffff;
+      border: 2px solid #7dd3fc;
+      border-radius: 12px;
+      font-size: 1.8rem;
+      letter-spacing: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 240px;
+    }
+    .key-btn {
+      width: 60px;
+      height: 60px;
+      background: #ffffff;
+      border: 1px solid #bae6fd;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #0284c7;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: 0.2s;
+    }
+    .key-btn:active {
+      transform: scale(0.92);
+      background: #e0f2fe;
+    }
+    .error-msg {
+      color: #ef4444;
+      font-weight: 600;
+      margin-top: 10px;
+      height: 24px;
+    }
+
+    /* Game 1: Candle */
+    .cake-svg {
+      width: 180px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    /* Game 2: Balloons Drop */
+    #balloon-container {
+      width: 100%;
+      height: 320px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.5);
+      border: 1px dashed #7dd3fc;
+      margin-top: 15px;
+    }
+    .balloon {
+      position: absolute;
+      width: 55px;
+      height: 70px;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #0284c7;
+      box-shadow: inset -5px -5px 10px rgba(0,0,0,0.08);
+      animation: fall linear infinite;
+    }
+    .balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 12px;
+      background: #94a3b8;
+    }
+    @keyframes fall {
+      0% { top: -80px; }
+      100% { top: 340px; }
+    }
+    .word-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: #ffffff;
+      border-radius: 20px;
+      margin: 5px;
+      font-weight: 700;
+      color: #0284c7;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* Game 3: Cake Puzzle */
+    .puzzle-board {
+      width: 200px;
+      height: 200px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      background: #e0f2fe;
+      padding: 6px;
+      border-radius: 16px;
+      margin-top: 15px;
+      border: 2px solid #7dd3fc;
+    }
+    .puzzle-piece {
+      background: #ffffff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+    .puzzle-piece:active {
+      transform: scale(0.95);
+    }
+
+    /* Tree & Flowers SVG */
+    .tree-svg, .flower-svg {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      margin-top: 10px;
+    }
+
+    /* Flower Growing Animation */
+    .stem {
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: growStem 2s forwards;
+    }
+    .petal {
+      transform: scale(0);
+      transform-origin: center;
+      animation: bloomPetal 1s 1.8s forwards;
+    }
+    @keyframes growStem {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes bloomPetal {
+      to { transform: scale(1); }
+    }
+
+    /* Final Message Text */
+    .letter-text {
+      text-align: justify;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      max-height: 300px;
+      overflow-y: auto;
+      border-left: 4px solid #38bdf8;
+    }
+
+    /* Closing Falling Balloons */
+    .closing-balloon {
+      position: fixed;
+      top: -100px;
+      width: 40px;
+      height: 55px;
+      border-radius: 50%;
+      opacity: 0.8;
+      pointer-events: none;
+      animation: bgFall 4s linear infinite;
+      z-index: 99;
+    }
+    @keyframes bgFall {
+      to { transform: translateY(110vh); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- SLIDE 1 -->
+    <div class="slide active" id="slide1">
+      <h1>This is your special day, Naefindra !</h1>
+      <button class="btn" onclick="goToSlide(2)">Next</button>
+    </div>
+
+    <!-- SLIDE 2: Countdown -->
+    <div class="slide" id="slide2">
+      <h2>Wait and see the surprise for you!!</h2>
+      <div class="timer-box" id="timer">00 : 00 : 05</div>
+    </div>
+
+    <!-- SLIDE 3: PIN -->
+    <div class="slide" id="slide3">
+      <h2>Masukkan PIN</h2>
+      <div class="pin-display" id="pinDisplay">****</div>
+      <div class="keypad">
+        <button class="key-btn" onclick="pressKey('1')">1</button>
+        <button class="key-btn" onclick="pressKey('2')">2</button>
+        <button class="key-btn" onclick="pressKey('3')">3</button>
+        <button class="key-btn" onclick="pressKey('4')">4</button>
+        <button class="key-btn" onclick="pressKey('5')">5</button>
+        <button class="key-btn" onclick="pressKey('6')">6</button>
+        <button class="key-btn" onclick="pressKey('7')">7</button>
+        <button class="key-btn" onclick="pressKey('8')">8</button>
+        <button class="key-btn" onclick="pressKey('9')">9</button>
+        <button class="key-btn" onclick="clearPin()">C</button>
+        <button class="key-btn" onclick="pressKey('0')">0</button>
+        <button class="key-btn" onclick="checkPin()">OK</button>
+      </div>
+      <div class="error-msg" id="pinError"></div>
+    </div>
+
+    <!-- GAME 1: Meniup Lilin -->
+    <div class="slide" id="game1">
+      <h2>Game 1: Meniup Lilin</h2>
+      <p style="font-size:0.9rem;">Ketuk api untuk meniup lilin!</p>
+      <svg class="cake-svg" viewBox="0 0 200 200" onclick="blowCandle()">
+        <!-- Cake Base -->
+        <rect x="40" y="120" width="120" height="50" rx="10" fill="#bae6fd"/>
+        <rect x="55" y="80" width="90" height="40" rx="8" fill="#e0f2fe"/>
+        <!-- Candle -->
+        <rect x="95" y="50" width="10" height="30" fill="#ffffff" rx="2"/>
+        <!-- Flame -->
+        <path id="flame" d="M100 32 C105 42, 102 48, 100 50 C98 48, 95 42, 100 32 Z" fill="#fbbf24"/>
+      </svg>
+      <button class="btn" id="btnGame1" style="display:none;" onclick="goToSlide('game2')">Lanjut Game berikutnya</button>
+    </div>
+
+    <!-- GAME 2: Meletuskan Balon -->
+    <div class="slide" id="game2">
+      <h2>Game 2: Meletuskan Balon</h2>
+      <p style="font-size:0.85rem;">Letuskan balon-balon melayang ini!</p>
+      <div id="collected-words">
+        <span class="word-badge" id="w1" style="opacity:0.3;">Happy</span>
+        <span class="word-badge" id="w2" style="opacity:0.3;">Birthday</span>
+        <span class="word-badge" id="w3" style="opacity:0.3;">Naefindra</span>
+      </div>
+      <div id="balloon-container"></div>
+      <button class="btn" id="btnGame2" style="display:none; margin-top:10px;" onclick="goToSlide('game3')">Lanjut Game berikutnya</button>
+    </div>
+
+    <!-- GAME 3: Menyusun Kue -->
+    <div class="slide" id="game3">
+      <h2>Game 3: Menyusun Kue</h2>
+      <p style="font-size:0.85rem;">Ketuk potongan kue untuk menyusunnya kembali secara utuh!</p>
+      <div class="puzzle-board" id="puzzleBoard"></div>
+      <button class="btn" id="btnGame3" style="display:none; margin-top:15px;" onclick="goToSlide('game4')">Lanjut Game berikutnya</button>
+    </div>
+
+    <!-- GAME 4: Pohon Realistis & Balon -->
+    <div class="slide" id="game4">
+      <svg class="tree-svg" viewBox="0 0 300 220">
+        <!-- Realistic Tree Trunk -->
+        <path d="M135 210 Q145 160 140 120 Q130 90 120 70 M140 120 Q160 95 175 75 M145 150 Q165 135 180 125" stroke="#78350f" stroke-width="12" stroke-linecap="round" fill="none"/>
+        <!-- Leaves Canopy -->
+        <circle cx="115" cy="60" r="35" fill="#86efac" opacity="0.9"/>
+        <circle cx="155" cy="55" r="40" fill="#4ade80" opacity="0.9"/>
+        <circle cx="180" cy="75" r="30" fill="#22c55e" opacity="0.8"/>
+        <!-- Flowers on Tree -->
+        <circle cx="110" cy="50" r="6" fill="#f472b6"/><circle cx="160" cy="45" r="7" fill="#fb7185"/><circle cx="135" cy="70" r="5" fill="#f43f5e"/>
+        <!-- Cute Pastel Balloons -->
+        <g transform="translate(40,30)"><ellipse cx="20" cy="25" rx="14" ry="18" fill="#7dd3fc"/><line x1="20" y1="43" x2="25" y2="80" stroke="#94a3b8"/></g>
+        <g transform="translate(220,40)"><ellipse cx="20" cy="25" rx="14" ry="18" fill="#f472b6"/><line x1="20" y1="43" x2="15" y2="80" stroke="#94a3b8"/></g>
+      </svg>
+      <p style="font-weight:bold; color:#0284c7; margin-top:10px;">Happy birthday naefindra, wish u all the best!!</p>
+      <button class="btn" onclick="goToSlide('game5')">Next</button>
+    </div>
+
+    <!-- GAME 5: Tangkai Bunga Tumbuh Mekar -->
+    <div class="slide" id="game5">
+      <h2>Bunga Tumbuh Mekar</h2>
+      <svg class="flower-svg" viewBox="0 0 200 200">
+        <!-- Left Flower Stem & Petals -->
+        <path class="stem" d="M60 190 Q50 130 70 80" stroke="#16a34a" stroke-width="4" fill="none"/>
+        <g class="petal" style="transform-origin: 70px 80px;">
+          <circle cx="70" cy="65" r="10" fill="#38bdf8"/>
+          <circle cx="85" cy="80" r="10" fill="#38bdf8"/>
+          <circle cx="70" cy="95" r="10" fill="#38bdf8"/>
+          <circle cx="55" cy="80" r="10" fill="#38bdf8"/>
+          <circle cx="70" cy="80" r="8" fill="#fef08a"/>
+        </g>
+        <!-- Center Flower Stem & Petals -->
+        <path class="stem" d="M100 190 Q105 110 100 60" stroke="#16a34a" stroke-width="5" fill="none"/>
+        <g class="petal" style="transform-origin: 100px 60px;">
+          <circle cx="100" cy="42" r="12" fill="#f472b6"/>
+          <circle cx="118" cy="60" r="12" fill="#f472b6"/>
+          <circle cx="100" cy="78" r="12" fill="#f472b6"/>
+          <circle cx="82" cy="60" r="12" fill="#f472b6"/>
+          <circle cx="100" cy="60" r="9" fill="#fef08a"/>
+        </g>
+        <!-- Right Flower Stem & Petals -->
+        <path class="stem" d="M140 190 Q150 140 130 90" stroke="#16a34a" stroke-width="4" fill="none"/>
+        <g class="petal" style="transform-origin: 130px 90px;">
+          <circle cx="130" cy="77" r="9" fill="#c084fc"/>
+          <circle cx="143" cy="90" r="9" fill="#c084fc"/>
+          <circle cx="130" cy="103" r="9" fill="#c084fc"/>
+          <circle cx="117" cy="90" r="9" fill="#c084fc"/>
+          <circle cx="130" cy="90" r="7" fill="#fef08a"/>
+        </g>
+      </svg>
+      <button class="btn" onclick="goToSlide('letter')">Lihat Ucapan Spesial</button>
+    </div>
+
+    <!-- LETTER SLIDE -->
+    <div class="slide" id="letter">
+      <div class="letter-text">
+        happy birthday, naa.<br><br>
+        You have grown up enough, gone through hard and tiring days, not forgetting your tears and laughter that are always there every day, steps that are sometimes difficult and several obstacles that exist. but you got through it, you're so great, na. I am always proud of you, in every aspect of your struggle there will be words of pride from me. I will always pray that you can continue to grow happily, that your steps will be made easier, and that happiness will await you. especially the most important thing, may God bless you with a long life. Happy birthday, Na. Best wishes for you.
+      </div>
+      <button class="btn" onclick="goToSlide('closing')">Next</button>
+    </div>
+
+    <!-- CLOSING SLIDE -->
+    <div class="slide" id="closing">
+      <h1 style="font-size: 2.2rem; color: #0284c7; margin-bottom: 20px;">EVERYONE IS PROUD OF YOU!</h1>
+    </div>
+
+  </div>
+
+  <script>
+    function goToSlide(slideId) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const target = typeof slideId === 'number' ? document.getElementById('slide' + slideId) : document.getElementById(slideId);
+      if(target) target.classList.add('active');
+
+      if(slideId === 2) startCountdown();
+      if(slideId === 'game2') startBalloonGame();
+      if(slideId === 'game3') initPuzzle();
+      if(slideId === 'closing') startClosing();
+    }
+
+    /* Countdown Slide 2 */
+    function startCountdown() {
+      let count = 5;
+      const timerEl = document.getElementById('timer');
+      const interval = setInterval(() => {
+        count--;
+        timerEl.innerText = `00 : 00 : 0${count}`;
+        if(count <= 0) {
+          clearInterval(interval);
+          goToSlide(3);
+        }
+      }, 1000);
+    }
+
+    /* Keypad PIN Slide 3 */
+    let currentPin = "";
+    function pressKey(num) {
+      if(currentPin.length < 4) {
+        currentPin += num;
+        document.getElementById('pinDisplay').innerText = "*".repeat(currentPin.length);
+      }
+    }
+    function clearPin() {
+      currentPin = "";
+      document.getElementById('pinDisplay').innerText = "****";
+      document.getElementById('pinError').innerText = "";
+    }
+    function checkPin() {
+      if(currentPin === "1810") {
+        goToSlide('game1');
+      } else {
+        document.getElementById('pinError').innerText = "pin salah";
+        clearPin();
+      }
+    }
+
+    /* Game 1: Candle */
+    function blowCandle() {
+      document.getElementById('flame').style.display = 'none';
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      document.getElementById('btnGame1').style.display = 'inline-block';
+    }
+
+    /* Game 2: Balloons */
+    let balloonInterval;
+    let poppedWords = { Happy: false, Birthday: false, Naefindra: false };
+    const colors = ['#bae6fd', '#fbcfe8', '#ddd6fe', '#fef08a', '#bbf7d0'];
+    const words = ['Happy', 'Birthday', 'Naefindra', '✨', '🎈', '💖'];
+
+    function startBalloonGame() {
+      const container = document.getElementById('balloon-container');
+      container.innerHTML = '';
+      balloonInterval = setInterval(() => {
+        const b = document.createElement('div');
+        b.className = 'balloon';
+        const word = words[Math.floor(Math.random() * words.length)];
+        b.innerText = word;
+        b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        b.style.left = Math.random() * (container.clientWidth - 60) + 'px';
+        b.style.animationDuration = (Math.random() * 2 + 3) + 's';
+
+        b.onclick = () => {
+          if(word === 'Happy') { poppedWords.Happy = true; document.getElementById('w1').style.opacity = '1'; }
+          if(word === 'Birthday') { poppedWords.Birthday = true; document.getElementById('w2').style.opacity = '1'; }
+          if(word === 'Naefindra') { poppedWords.Naefindra = true; document.getElementById('w3').style.opacity = '1'; }
+          
+          confetti({ particleCount: 15, spread: 40, origin: { x: 0.5, y: 0.5 } });
+          b.remove();
+
+          if(poppedWords.Happy && poppedWords.Birthday && poppedWords.Naefindra) {
+            clearInterval(balloonInterval);
+            document.getElementById('btnGame2').style.display = 'inline-block';
+          }
+        };
+
+        container.appendChild(b);
+        setTimeout(() => b.remove(), 5000);
+      }, 800);
+    }
+
+    /* Game 3: Cake Puzzle */
+    let puzzleState = [2, 0, 3, 1]; // Shuffled pieces
+    const correctState = [0, 1, 2, 3];
+    const cakeIcons = ['🧁', '🍰', '🎂', '🥮'];
+
+    function initPuzzle() {
+      renderPuzzle();
+    }
+    function renderPuzzle() {
+      const board = document.getElementById('puzzleBoard');
+      board.innerHTML = '';
+      puzzleState.forEach((val, idx) => {
+        const piece = document.createElement('div');
+        piece.className = 'puzzle-piece';
+        piece.innerText = cakeIcons[val];
+        piece.onclick = () => swapPiece(idx);
+        board.appendChild(piece);
+      });
+    }
+    function swapPiece(idx) {
+      if(idx < puzzleState.length - 1) {
+        let temp = puzzleState[idx];
+        puzzleState[idx] = puzzleState[idx+1];
+        puzzleState[idx+1] = temp;
+      } else {
+        let temp = puzzleState[idx];
+        puzzleState[idx] = puzzleState[0];
+        puzzleState[0] = temp;
+      }
+      renderPuzzle();
+      if(JSON.stringify(puzzleState) === JSON.stringify(correctState)) {
+        confetti({ particleCount: 40, spread: 60 });
+        document.getElementById('btnGame3').style.display = 'inline-block';
+      }
+    }
+
+    /* Closing Balloons Fall */
+    function startClosing() {
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+      setInterval(() => {
+        const b = document.createElement('div');
+        b.className = 'closing-balloon';
+        b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        b.style.left = Math.random() * 100 + 'vw';
+        b.style.animationDuration = (Math.random() * 2 + 3) + 's';
+        document.body.appendChild(b);
+        setTimeout(() => b.remove(), 4000);
+      }, 300);
+    }
+  </script>
+</body>
+</html>
